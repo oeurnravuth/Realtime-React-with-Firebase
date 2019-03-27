@@ -1,27 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import { db } from './firebase';
-
-function useCollection(path, orderby) {
-  const [docs, setDocs] = useState([]);
-
-  useEffect(() => {
-    return db
-      .collection(path)
-      .orderBy(orderby)
-      .onSnapshot(snapshot => {
-        const docs = [];
-        snapshot.forEach(doc => {
-          docs.push({
-            ...doc.data(),
-            id: doc.id,
-          });
-        });
-        setDocs(docs);
-      });
-  }, []);
-
-  return docs;
-}
+import React from 'react';
+import useCollection from './useCollection';
 
 function Messages() {
   const messages = useCollection('channels/random/messages', 'createdAt');
