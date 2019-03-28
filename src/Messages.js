@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import useCollection from './useCollection';
+import { db } from './firebase';
 
 function Messages() {
   const messages = useCollection('channels/random/messages', 'createdAt');
@@ -26,7 +27,22 @@ function Messages() {
   );
 }
 
+function useDoc(path) {
+  const [doc, setDoc] = useState();
+
+  useEffect(() => {
+    db.doc(path).onSnapshot(doc => {
+      setDoc({
+        ...doc.data(),
+        id: doc.id,
+      });
+    });
+  });
+  return doc;
+}
+
 function FirstmessageFromUser({ message, showDay }) {
+  const author = useDoc(message.user.path);
   return (
     <div key={message.id}>
       {showDay && (
@@ -37,10 +53,15 @@ function FirstmessageFromUser({ message, showDay }) {
         </div>
       )}
       <div className="Message with-avatar">
-        <div className="Avatar" />
+        <div
+          className="Avatar"
+          style={{
+            backgroundImage: author ? `url("${author.photoUrl}")` : '',
+          }}
+        />
         <div className="Author">
           <div>
-            <span className="UserName">Ryan Florence </span>
+            <span className="UserName">{author && author.displayName}</span>
             <span className="TimeStamp">3:37 PM</span>
           </div>
           <div className="MessageContent">{message.text}</div>
