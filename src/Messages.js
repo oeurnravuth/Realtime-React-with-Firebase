@@ -14,7 +14,11 @@ function Messages({ channelId }) {
         const showDay = false;
         const showAvatar = !previous || message.user.id !== previous.user.id;
         return showAvatar ? (
-          <FirstmessageFromUser message={message} showDay={showDay} />
+          <FirstmessageFromUser
+            message={message}
+            showDay={showDay}
+            key={message.id}
+          />
         ) : (
           <div key={message.id}>
             <div className="Message no-avatar">
@@ -31,13 +35,13 @@ function useDoc(path) {
   const [doc, setDoc] = useState();
 
   useEffect(() => {
-    db.doc(path).onSnapshot(doc => {
+    return db.doc(path).onSnapshot(doc => {
       setDoc({
         ...doc.data(),
         id: doc.id,
       });
     });
-  });
+  }, [path]);
   return doc;
 }
 
