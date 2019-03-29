@@ -4,10 +4,18 @@ import useDocWithCache from './useDocWithCache';
 import formatDate from 'date-fns/format';
 import isSameDay from 'date-fns/is_same_day';
 
+function useChatScrollManager(ref) {
+  useEffect(() => {
+    const node = ref.current;
+    node.scrollTop = node.scrollHeight;
+  });
+}
+
 function Messages({ channelId }) {
   const messages = useCollection(`channels/${channelId}/messages`, 'createdAt');
 
   const scrollerRef = useRef();
+  useChatScrollManager(scrollerRef);
 
   return (
     <div ref={scrollerRef} className="Messages">
