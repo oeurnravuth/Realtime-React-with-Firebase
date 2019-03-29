@@ -8,9 +8,7 @@ import { db } from './firebase';
 function Channel({ user, channelId }) {
   useEffect(() => {
     db.doc(`users/${user.uid}`).update({
-      channels: {
-        [channelId]: true,
-      },
+      [`channnels.${channelId}`]: true,
     });
   }, [user.uid, channelId]);
 
