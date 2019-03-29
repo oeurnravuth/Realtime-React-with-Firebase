@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import useCollection from './useCollection';
-import { db } from './firebase';
+import useDocWithCache from './useDocWithCache';
 
 function Messages({ channelId }) {
   const messages = useCollection(`channels/${channelId}/messages`, 'createdAt');
@@ -31,22 +31,8 @@ function Messages({ channelId }) {
   );
 }
 
-function useDoc(path) {
-  const [doc, setDoc] = useState();
-
-  useEffect(() => {
-    return db.doc(path).onSnapshot(doc => {
-      setDoc({
-        ...doc.data(),
-        id: doc.id,
-      });
-    });
-  }, [path]);
-  return doc;
-}
-
 function FirstmessageFromUser({ message, showDay }) {
-  const author = useDoc(message.user.path);
+  const author = useDocWithCache(message.user.path);
   return (
     <div key={message.id}>
       {showDay && (
@@ -67,7 +53,9 @@ function FirstmessageFromUser({ message, showDay }) {
           <div>
             <span className="UserName">{author && author.displayName}</span>
             {''}
-            <span className="TimeStamp"> 3:37 PM</span>
+            <span className="TimeStamp">
+              {new Date(message.createdAt.seconds * 1000).toLocaleTimeString()}
+            </span>
           </div>
           <div className="MessageContent">{message.text}</div>
         </div>
