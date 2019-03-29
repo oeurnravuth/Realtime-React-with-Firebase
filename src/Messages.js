@@ -1,19 +1,23 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import useCollection from './useCollection';
 import useDocWithCache from './useDocWithCache';
 import formatDate from 'date-fns/format';
+import isSameDay from 'date-fns/is_same_day';
 
 function Messages({ channelId }) {
   const messages = useCollection(`channels/${channelId}/messages`, 'createdAt');
 
+  const scrollerRef = useRef();
+
   return (
-    <div className="Messages">
+    <div ref={scrollerRef} className="Messages">
       <div className="EndOfMessages">That's every message!</div>
 
       {messages.map((message, index) => {
         const previous = messages[index - 1];
-        const showDay = false;
-        const showAvatar = !previous || message.user.id !== previous.user.id;
+        const showDay = shouldShowDay(previous, message);
+        const showAvatar = shouldShowAvatar(previous, message);
+
         return showAvatar ? (
           <FirstmessageFromUser
             message={message}
@@ -39,7 +43,9 @@ function FirstmessageFromUser({ message, showDay }) {
       {showDay && (
         <div className="Day">
           <div className="DayLine" />
-          <div className="DayText">12/6/2018</div>
+          <div className="DayText">
+            {new Date(message.createdAt.seconds * 1000).toLocaleDateString()}
+          </div>
           <div className="DayLine" />
         </div>
       )}
@@ -63,6 +69,35 @@ function FirstmessageFromUser({ message, showDay }) {
       </div>
     </div>
   );
+}
+
+function shouldShowDay(previous, message) {
+  const isFirst = !previous;
+  if (isFirst) {
+    return true;
+  }
+
+  const isNewDay = !isSameDay(
+    previous.createdAt.seconds * 1000,
+    message.createdAt.seconds * 1000,
+  );
+
+  return isNewDay;
+}
+
+function shouldShowAvatar(previous, message) {
+  const isFirst = !previous;
+  if (isFirst) {
+    return true;
+  }
+  const differentUser = message.user.id !== previous.user.id;
+  if (differentUser) {
+    return true;
+  }
+  const hasBeenAWhile =
+    message.createdAt.seconds - previous.createdAt.seconds > 180;
+
+  return hasBeenAWhile;
 }
 
 export default Messages;
