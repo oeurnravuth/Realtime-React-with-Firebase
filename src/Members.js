@@ -3,7 +3,7 @@ import useCollection from './useCollection';
 
 function Members({ channelId }) {
   const members = useCollection('users', undefined, [
-    `channels.$(channelId)`,
+    `channels.${channelId}`,
     '==',
     true,
   ]);
@@ -13,14 +13,12 @@ function Members({ channelId }) {
   return (
     <div className="Members">
       <div>
-        <div className="Member">
-          <div className="MemberStatus offline" />
-          Ryan Florence
-        </div>
-        <div className="Member">
-          <div className="MemberStatus online" />
-          cleverbot
-        </div>
+        {members.map(member => (
+          <div className="Member">
+            <div className="MemberStatus online" />
+            {member.displayName}
+          </div>
+        ))}
       </div>
     </div>
   );
