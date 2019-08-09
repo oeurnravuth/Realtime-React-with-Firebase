@@ -1,14 +1,27 @@
-import React from 'react';
-import useCollection from './useCollection';
+import React, { useEffect } from "react";
+import useCollection from "./useCollection";
+import { db } from "./firebase";
 
 function Members({ channelId }) {
-  const members = useCollection('users', undefined, [
-    `channels.${channelId}`,
-    '==',
-    true,
-  ]);
+  const members = useCollection("users", undefined);
 
-  console.log(members);
+  // useEffect(() => {
+  //   db.collection("users")
+  //     .where(`channels.${channelId}`, "==", true)
+  //     .onSnapshot(snapshot => {
+  //       const docs = [];
+  //       snapshot.forEach(doc => {
+  //         docs.push({
+  //           ...doc.data(),
+  //           id: doc.id
+  //         });
+  //       });
+
+  //       console.log(docs);
+  //     });
+  // }, []);
+
+  console.log("member =>", members);
 
   return (
     <div className="Members">
